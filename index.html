@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pix2Pix Facade Builder - cGAN Demo</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="glow-bg"></div>
+    
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fa-solid fa-wand-magic-sparkles logo-icon"></i>
+                <h1>Pix2Pix <span>cGAN</span></h1>
+            </div>
+            <p class="subtitle">Conditional Adversarial Network for Image Translation</p>
+        </div>
+    </header>
+    <main class="container">
+        <div class="dashboard-grid">
+            <!-- Left Panel: Input Design Tools -->
+            <section class="card control-panel">
+                <div class="panel-header">
+                    <h2><i class="fa-solid fa-palette"></i> Design Input</h2>
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="draw"><i class="fa-solid fa-paintbrush"></i> Paint Canvas</button>
+                        <button class="tab-btn" data-tab="upload"><i class="fa-solid fa-file-arrow-up"></i> Upload Label</button>
+                    </div>
+                </div>
+                <!-- Tab 1: Draw Canvas -->
+                <div class="tab-content active" id="draw-tab">
+                    <div class="canvas-container">
+                        <canvas id="paintCanvas" width="256" height="256"></canvas>
+                    </div>
+                    <div class="canvas-toolbar">
+                        <div class="brush-settings">
+                            <label for="brushSize">Size: <span id="brushSizeVal">15px</span></label>
+                            <input type="range" id="brushSize" min="5" max="40" value="15">
+                        </div>
+                        <div class="toolbar-actions">
+                            <button id="clearBtn" class="btn btn-secondary"><i class="fa-solid fa-trash-can"></i> Clear</button>
+                            <button id="fillBtn" class="btn btn-secondary"><i class="fa-solid fa-fill-drip"></i> Fill Wall</button>
+                        </div>
+                    </div>
+                    
+                    <div class="palette-title">Semantic Facade Labels</div>
+                    <div class="color-palette">
+                        <div class="color-tool active" data-color="#ff0000" data-label="Wall" style="background-color: #ff0000;">
+                            <span>Wall</span>
+                        </div>
+                        <div class="color-tool" data-color="#00ffff" data-label="Window" style="background-color: #00ffff; color: #000;">
+                            <span>Window</span>
+                        </div>
+                        <div class="color-tool" data-color="#0000ff" data-label="Door" style="background-color: #0000ff;">
+                            <span>Door</span>
+                        </div>
+                        <div class="color-tool" data-color="#ffff00" data-label="Pillar" style="background-color: #ffff00; color: #000;">
+                            <span>Pillar</span>
+                        </div>
+                        <div class="color-tool" data-color="#00ff00" data-label="Cornice" style="background-color: #00ff00; color: #000;">
+                            <span>Cornice</span>
+                        </div>
+                        <div class="color-tool" data-color="#ff00ff" data-label="Balcony" style="background-color: #ff00ff;">
+                            <span>Balcony</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tab 2: Upload File -->
+                <div class="tab-content" id="upload-tab">
+                    <div class="drop-zone" id="dropZone">
+                        <i class="fa-solid fa-cloud-arrow-up drop-icon"></i>
+                        <p>Drag & drop your semantic label image here</p>
+                        <span>or click to browse files</span>
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    </div>
+                    <div class="preview-container" id="uploadPreviewContainer" style="display: none;">
+                        <img id="uploadPreview" src="" alt="Upload Preview">
+                        <button id="removeUploadBtn" class="btn btn-danger"><i class="fa-solid fa-xmark"></i> Remove</button>
+                    </div>
+                </div>
+                <button id="translateBtn" class="btn btn-primary btn-block">
+                    <i class="fa-solid fa-play"></i> Translate Layout to Facade
+                </button>
+            </section>
+            <!-- Right Panel: Translation Output -->
+            <section class="card output-panel">
+                <h2><i class="fa-solid fa-circle-check"></i> Translation Results</h2>
+                
+                <div class="results-grid">
+                    <div class="result-box">
+                        <h3>Input Layout</h3>
+                        <div class="image-wrapper empty" id="inputWrapper">
+                            <span class="placeholder-text">Draw on canvas or load a preset</span>
+                            <img id="inputImg" src="" alt="Input Layout" style="display: none;">
+                        </div>
+                    </div>
+                    
+                    <div class="result-box">
+                        <h3>Generated Photo (cGAN)</h3>
+                        <div class="image-wrapper empty" id="outputWrapper">
+                            <div class="loading-spinner" style="display: none;">
+                                <div class="spinner"></div>
+                                <p>Running pix2pix...</p>
+                            </div>
+                            <span class="placeholder-text">Pending translation...</span>
+                            <img id="outputImg" src="" alt="cGAN Output" style="display: none;">
+                        </div>
+                    </div>
+                    <div class="result-box comparison-box" id="targetBox" style="display: none;">
+                        <h3>Real Target Photo</h3>
+                        <div class="image-wrapper" id="targetWrapper">
+                            <img id="targetImg" src="" alt="Ground Truth">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <!-- Gallery Presets Section -->
+        <section class="card gallery-section">
+            <div class="gallery-header">
+                <h2><i class="fa-solid fa-images"></i> Facades Validation Gallery</h2>
+                <p>Select a validation sample to load its semantic map and evaluate the generator's translation accuracy against the real photo.</p>
+            </div>
+            <div class="presets-gallery" id="presetsGallery">
+                <!-- Preset items loaded dynamically -->
+                <div class="gallery-loading">
+                    <div class="spinner spinner-small"></div>
+                    <span>Loading validation gallery presets...</span>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>Pix2Pix cGAN Image-to-Image Translation Dashboard &copy; 2026. Built with PyTorch & Flask.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
