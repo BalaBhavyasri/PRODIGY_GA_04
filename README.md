@@ -1,4 +1,3 @@
-# PRODIGY_GA_04
 Task 04 – Image-to-Image Translation with cGAN
 
 An image-to-image translation project using a **Conditional Generative Adversarial Network (cGAN)** based on the **pix2pix architecture** to transform images from one visual domain into another.
